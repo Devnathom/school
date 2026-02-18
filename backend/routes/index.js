@@ -11,6 +11,10 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/dashboard', (req, res) => {
+  res.redirect('/');
+});
+
 // Login
 router.get('/login', (req, res) => {
   res.render('login', { title: 'เข้าสู่ระบบ' });
