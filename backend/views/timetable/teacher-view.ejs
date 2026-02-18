@@ -1,0 +1,68 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-chalkboard-teacher mr-2"></i>ตารางสอน</h1>
+        <small class="text-muted"><%= teacher.firstName %> <%= teacher.lastName %> | <%= academicYear.name %></small>
+      </div>
+      <div class="col-sm-6 text-right">
+        <a href="/app/timetable/conflicts" class="btn btn-secondary"><i class="fas fa-arrow-left mr-1"></i>กลับ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-body p-0 table-responsive">
+        <table class="table table-bordered mb-0" style="min-width: 800px;">
+          <thead class="bg-info text-white">
+            <tr>
+              <th width="120" class="text-center">คาบ / วัน</th>
+              <% for (let d = 1; d <= 5; d++) { %>
+              <th class="text-center"><%= dayNames[d] %></th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% periods.forEach(function(p) { %>
+            <tr class="<%= p.is_break ? 'table-warning' : '' %>">
+              <td class="text-center" style="vertical-align: middle;">
+                <strong><%= p.name %></strong><br>
+                <small class="text-muted"><%= p.start_time.substring(0,5) %>-<%= p.end_time.substring(0,5) %></small>
+              </td>
+              <% for (let d = 1; d <= 5; d++) { %>
+              <td class="text-center p-2" style="vertical-align: middle;">
+                <% if (p.is_break) { %>
+                  <small class="text-muted"><i class="fas fa-coffee"></i></small>
+                <% } else { %>
+                  <% const key = d + '_' + p.id; %>
+                  <% const entry = timetableData[key]; %>
+                  <% if (entry) { %>
+                    <div class="bg-light rounded p-1" style="font-size: 0.85em;">
+                      <strong class="text-primary"><%= entry.subject_code %></strong><br>
+                      <small><%= entry.subject_name %></small><br>
+                      <small class="text-success"><i class="fas fa-school"></i> <%= entry.class_name %></small><br>
+                      <% if (entry.room_name) { %>
+                      <small class="text-info"><i class="fas fa-door-open"></i> <%= entry.room_name %></small>
+                      <% } %>
+                    </div>
+                  <% } else { %>
+                    <small class="text-muted">-</small>
+                  <% } %>
+                <% } %>
+              </td>
+              <% } %>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { success, error }) %>

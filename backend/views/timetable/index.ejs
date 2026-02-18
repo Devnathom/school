@@ -1,0 +1,215 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-4">
+        <h1><i class="fas fa-calendar-week mr-2"></i>ตารางเรียน</h1>
+      </div>
+      <div class="col-sm-8 text-right">
+        <% if (!noAY) { %>
+        <span class="badge badge-info p-2 mr-2"><i class="fas fa-calendar mr-1"></i><%= academicYear.name %></span>
+        <a href="/app/timetable/class-subjects" class="btn btn-info mr-1"><i class="fas fa-list mr-1"></i>จัดวิชาเรียน</a>
+        <a href="/app/timetable/conflicts" class="btn btn-warning mr-1">
+          <i class="fas fa-exclamation-triangle mr-1"></i>วิเคราะห์
+          <% if (conflicts.length > 0) { %><span class="badge badge-danger ml-1"><%= conflicts.length %></span><% } %>
+        </a>
+        <form action="/app/timetable/auto-generate" method="POST" class="d-inline" onsubmit="return confirm('ระบบจะลบตารางเดิม (ที่ไม่ได้ล็อก) แล้วสร้างใหม่อัตโนมัติ ยืนยัน?')">
+          <button type="submit" class="btn btn-success"><i class="fas fa-magic mr-1"></i>จัดตารางอัตโนมัติ</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <% if (noAY) { %>
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">ยังไม่มีปีการศึกษาปัจจุบัน</h5>
+        <a href="/app/academic-years" class="btn btn-primary mt-2"><i class="fas fa-plus mr-1"></i>จัดการปีการศึกษา</a>
+      </div>
+    </div>
+    <% } else { %>
+
+    <% if (conflicts.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <i class="fas fa-exclamation-triangle mr-1"></i>
+      <strong>พบปัญหา <%= conflicts.length %> รายการ!</strong>
+      <a href="/app/timetable/conflicts" class="alert-link ml-2">ดูรายละเอียด</a>
+    </div>
+    <% } %>
+
+    <!-- Class selector -->
+    <div class="card">
+      <div class="card-body">
+        <form method="GET" class="form-inline">
+          <label class="mr-2"><strong>เลือกชั้นเรียน:</strong></label>
+          <select name="class_id" class="form-control mr-2" onchange="this.form.submit()">
+            <% classes.forEach(function(c) { %>
+            <option value="<%= c.id %>" <%= c.id === selectedClassId ? 'selected' : '' %>><%= c.name %></option>
+            <% }); %>
+          </select>
+          <% if (classes.length === 0) { %>
+          <span class="text-muted">ยังไม่มีชั้นเรียน <a href="/app/classes">เพิ่มชั้นเรียน</a></span>
+          <% } %>
+        </form>
+      </div>
+    </div>
+
+    <% if (selectedClassId && periods.length > 0) { %>
+    <!-- Timetable Grid -->
+    <div class="card">
+      <div class="card-body p-0 table-responsive">
+        <table class="table table-bordered mb-0" style="min-width: 800px;">
+          <thead class="bg-primary text-white">
+            <tr>
+              <th width="120" class="text-center">คาบ / วัน</th>
+              <% for (let d = 1; d <= 5; d++) { %>
+              <th class="text-center"><%= dayNames[d] %></th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% periods.forEach(function(p) { %>
+            <tr class="<%= p.is_break ? 'table-warning' : '' %>">
+              <td class="text-center" style="vertical-align: middle;">
+                <strong><%= p.name %></strong><br>
+                <small class="text-muted"><%= p.start_time.substring(0,5) %>-<%= p.end_time.substring(0,5) %></small>
+              </td>
+              <% for (let d = 1; d <= 5; d++) { %>
+              <td class="text-center p-1" style="vertical-align: middle; min-width: 130px;">
+                <% if (p.is_break) { %>
+                  <small class="text-muted"><i class="fas fa-coffee"></i></small>
+                <% } else { %>
+                  <% const key = d + '_' + p.id; %>
+                  <% const entry = timetableData[key]; %>
+                  <% if (entry) { %>
+                    <div class="bg-light rounded p-1" style="font-size: 0.85em;">
+                      <strong class="text-primary"><%= entry.subject_code %></strong><br>
+                      <small><%= entry.subject_name %></small><br>
+                      <small class="text-success"><i class="fas fa-user"></i> <%= entry.teacher_first %> <%= entry.teacher_last.charAt(0) %>.</small><br>
+                      <% if (entry.room_name) { %>
+                      <small class="text-info"><i class="fas fa-door-open"></i> <%= entry.room_name %></small>
+                      <% } %>
+                      <div class="mt-1">
+                        <a href="/app/timetable/delete/<%= entry.id %>" class="btn btn-xs btn-outline-danger" onclick="return confirm('ลบรายการนี้?')" title="ลบ">
+                          <i class="fas fa-times"></i>
+                        </a>
+                      </div>
+                    </div>
+                  <% } else { %>
+                    <button class="btn btn-xs btn-outline-secondary" data-toggle="modal" data-target="#addEntryModal"
+                      onclick="setSlot(<%= d %>, <%= p.id %>)">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  <% } %>
+                <% } %>
+              </td>
+              <% } %>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <% } else if (periods.length === 0) { %>
+    <div class="card">
+      <div class="card-body text-center py-4">
+        <p class="text-muted">ยังไม่มีคาบเรียน</p>
+        <a href="/app/academic-years" class="btn btn-info"><i class="fas fa-clock mr-1"></i>ตั้งค่าคาบเรียน</a>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Add Entry Modal -->
+    <div class="modal fade" id="addEntryModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form action="/app/timetable/add" method="POST">
+            <input type="hidden" name="class_id" value="<%= selectedClassId %>">
+            <input type="hidden" name="day_of_week" id="slotDay">
+            <input type="hidden" name="period_id" id="slotPeriod">
+            <div class="modal-header bg-primary">
+              <h5 class="modal-title text-white"><i class="fas fa-plus mr-2"></i>เพิ่มรายการตารางเรียน</h5>
+              <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <p><strong>วัน:</strong> <span id="slotDayName"></span> | <strong>คาบ:</strong> <span id="slotPeriodName"></span></p>
+              <div class="form-group">
+                <label>รายวิชา <span class="text-danger">*</span></label>
+                <select name="subject_id" class="form-control" required>
+                  <option value="">-- เลือกรายวิชา --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ครูผู้สอน <span class="text-danger">*</span></label>
+                <select name="teacher_id" class="form-control" required>
+                  <option value="">-- เลือกครู --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ห้องเรียน</label>
+                <select name="room_id" class="form-control">
+                  <option value="">-- ไม่ระบุ --</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <% } %>
+  </div>
+</section>
+
+<script>
+var dayNames = ['', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
+var periodsMap = {};
+<% periods.forEach(function(p) { %>
+periodsMap[<%= p.id %>] = '<%= p.name %>';
+<% }); %>
+
+function setSlot(day, periodId) {
+  document.getElementById('slotDay').value = day;
+  document.getElementById('slotPeriod').value = periodId;
+  document.getElementById('slotDayName').textContent = dayNames[day];
+  document.getElementById('slotPeriodName').textContent = periodsMap[periodId] || '';
+}
+</script>
+
+<!-- Load subjects/teachers/rooms dynamically -->
+<script>
+$(document).ready(function() {
+  // Fetch data for dropdowns via API
+  $.get('/api/subjects', function(data) {
+    var sel = $('select[name="subject_id"]');
+    data.forEach(function(s) {
+      sel.append('<option value="' + s.id + '">' + s.code + ' - ' + s.name + '</option>');
+    });
+  });
+  $.get('/api/teachers', function(data) {
+    var sel = $('select[name="teacher_id"]');
+    data.forEach(function(t) {
+      sel.append('<option value="' + t.id + '">' + t.firstName + ' ' + t.lastName + '</option>');
+    });
+  });
+  $.get('/api/rooms', function(data) {
+    var sel = $('select[name="room_id"]');
+    data.forEach(function(r) {
+      sel.append('<option value="' + r.id + '">' + r.name + (r.building ? ' (' + r.building + ')' : '') + '</option>');
+    });
+  });
+});
+</script>
+
+<%- include('../partials/footer', { success, error }) %>

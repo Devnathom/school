@@ -1,0 +1,128 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-clock mr-2"></i>คาบเรียน - <%= academicYear.name %></h1>
+      </div>
+      <div class="col-sm-6 text-right">
+        <a href="/app/academic-years/<%= academicYear.id %>/periods/generate-default" class="btn btn-success mr-1" onclick="return confirm('จะลบคาบเรียนเดิมทั้งหมดและสร้างใหม่ ยืนยัน?')">
+          <i class="fas fa-magic mr-1"></i>สร้างคาบมาตรฐาน
+        </a>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addPeriodModal">
+          <i class="fas fa-plus mr-1"></i>เพิ่มคาบ
+        </button>
+        <a href="/app/academic-years" class="btn btn-secondary ml-1">
+          <i class="fas fa-arrow-left mr-1"></i>กลับ
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-body p-0">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th width="60">ลำดับ</th>
+              <th>ชื่อคาบ</th>
+              <th>เวลาเริ่ม</th>
+              <th>เวลาสิ้นสุด</th>
+              <th>ประเภท</th>
+              <th width="80">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% periods.forEach(function(p) { %>
+            <tr class="<%= p.is_break ? 'table-warning' : '' %>">
+              <td><%= p.period_order %></td>
+              <td>
+                <% if (p.is_break) { %><i class="fas fa-coffee text-warning mr-1"></i><% } else { %><i class="fas fa-book text-primary mr-1"></i><% } %>
+                <strong><%= p.name %></strong>
+              </td>
+              <td><%= p.start_time %></td>
+              <td><%= p.end_time %></td>
+              <td>
+                <% if (p.is_break) { %>
+                  <span class="badge badge-warning">พัก</span>
+                <% } else { %>
+                  <span class="badge badge-primary">เรียน</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/app/academic-years/<%= academicYear.id %>/periods/<%= p.id %>/delete" class="btn btn-sm btn-danger" onclick="return confirm('ยืนยันลบคาบนี้?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            <% }); %>
+            <% if (periods.length === 0) { %>
+            <tr><td colspan="6" class="text-center text-muted py-4">ยังไม่มีคาบเรียน กดปุ่ม "สร้างคาบมาตรฐาน" เพื่อสร้างอัตโนมัติ</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add Period Modal -->
+<div class="modal fade" id="addPeriodModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/app/academic-years/<%= academicYear.id %>/periods/add" method="POST">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white"><i class="fas fa-plus mr-2"></i>เพิ่มคาบเรียน</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>ชื่อคาบ <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" required placeholder="เช่น คาบที่ 1">
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>เวลาเริ่ม <span class="text-danger">*</span></label>
+                <input type="time" name="start_time" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>เวลาสิ้นสุด <span class="text-danger">*</span></label>
+                <input type="time" name="end_time" class="form-control" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ลำดับ <span class="text-danger">*</span></label>
+                <input type="number" name="period_order" class="form-control" value="<%= periods.length + 1 %>" min="1" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ประเภท</label>
+                <div class="custom-control custom-switch mt-2">
+                  <input type="checkbox" class="custom-control-input" id="isBreak" name="is_break">
+                  <label class="custom-control-label" for="isBreak">เป็นช่วงพัก</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { success, error }) %>

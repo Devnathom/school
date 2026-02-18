@@ -1,0 +1,146 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6"><h1><i class="fas fa-calendar-alt mr-2"></i>จัดการปีการศึกษา</h1></div>
+      <div class="col-sm-6 text-right">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+          <i class="fas fa-plus mr-1"></i>เพิ่มปีการศึกษา
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <% years.forEach(function(y) { %>
+      <div class="col-lg-4 col-md-6">
+        <div class="card card-<%= y.is_current ? 'primary' : 'outline-secondary' %>">
+          <div class="card-header">
+            <h3 class="card-title">
+              <% if (y.is_current) { %><i class="fas fa-star text-warning mr-1"></i><% } %>
+              <%= y.name %>
+            </h3>
+            <div class="card-tools">
+              <span class="badge badge-<%= y.status === 'active' ? 'success' : y.status === 'closed' ? 'danger' : 'info' %>">
+                <%= y.status === 'active' ? 'ใช้งาน' : y.status === 'closed' ? 'ปิดแล้ว' : 'วางแผน' %>
+              </span>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm table-borderless mb-0">
+              <tr>
+                <td><i class="fas fa-calendar mr-1"></i> ปี</td>
+                <td><strong><%= y.year %></strong></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-book-open mr-1"></i> ภาคเรียน</td>
+                <td><strong>ภาคเรียนที่ <%= y.semester %></strong></td>
+              </tr>
+              <% if (y.start_date) { %>
+              <tr>
+                <td><i class="fas fa-play mr-1"></i> เริ่ม</td>
+                <td><%= new Date(y.start_date).toLocaleDateString('th-TH') %></td>
+              </tr>
+              <% } %>
+              <% if (y.end_date) { %>
+              <tr>
+                <td><i class="fas fa-stop mr-1"></i> สิ้นสุด</td>
+                <td><%= new Date(y.end_date).toLocaleDateString('th-TH') %></td>
+              </tr>
+              <% } %>
+            </table>
+          </div>
+          <div class="card-footer">
+            <div class="btn-group btn-group-sm w-100">
+              <a href="/app/academic-years/<%= y.id %>/periods" class="btn btn-info" title="คาบเรียน">
+                <i class="fas fa-clock mr-1"></i>คาบเรียน
+              </a>
+              <% if (!y.is_current) { %>
+              <a href="/app/academic-years/<%= y.id %>/set-current" class="btn btn-success" title="ตั้งเป็นปัจจุบัน">
+                <i class="fas fa-star mr-1"></i>ตั้งเป็นปัจจุบัน
+              </a>
+              <% } %>
+              <a href="#" onclick="confirmDelete('/app/academic-years/<%= y.id %>/delete', '<%= y.name %>')" class="btn btn-danger" title="ลบ">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+
+      <% if (years.length === 0) { %>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center py-5">
+            <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">ยังไม่มีปีการศึกษา</h5>
+            <p class="text-muted">กดปุ่ม "เพิ่มปีการศึกษา" เพื่อเริ่มต้น</p>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/app/academic-years/add" method="POST">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white"><i class="fas fa-plus mr-2"></i>เพิ่มปีการศึกษา</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ปีการศึกษา <span class="text-danger">*</span></label>
+                <input type="number" name="year" class="form-control" value="2567" min="2500" max="2600" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ภาคเรียน <span class="text-danger">*</span></label>
+                <select name="semester" class="form-control" required>
+                  <option value="1">ภาคเรียนที่ 1</option>
+                  <option value="2">ภาคเรียนที่ 2</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ชื่อ</label>
+            <input type="text" name="name" class="form-control" placeholder="เช่น ปีการศึกษา 2567 ภาคเรียนที่ 1">
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>วันเริ่มต้น</label>
+                <input type="date" name="start_date" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>วันสิ้นสุด</label>
+                <input type="date" name="end_date" class="form-control">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { success, error }) %>

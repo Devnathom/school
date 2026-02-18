@@ -102,6 +102,31 @@
               <p>จัดการเกรด</p>
             </a>
           </li>
+          <li class="nav-header">จัดตารางเรียน</li>
+          <li class="nav-item">
+            <a href="/app/academic-years" class="nav-link <%= page === 'academic-years' ? 'active' : '' %>">
+              <i class="nav-icon fas fa-calendar-alt"></i>
+              <p>ปีการศึกษา</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/app/rooms" class="nav-link <%= page === 'rooms' ? 'active' : '' %>">
+              <i class="nav-icon fas fa-door-open"></i>
+              <p>ห้องเรียน</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/app/timetable" class="nav-link <%= page === 'timetable' ? 'active' : '' %>">
+              <i class="nav-icon fas fa-calendar-week"></i>
+              <p>ตารางเรียน</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/app/timetable/conflicts" class="nav-link <%= page === 'timetable-analysis' ? 'active' : '' %>">
+              <i class="nav-icon fas fa-exclamation-triangle"></i>
+              <p>วิเคราะห์ตาราง</p>
+            </a>
+          </li>
         </ul>
       </nav>
     </div>

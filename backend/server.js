@@ -36,6 +36,9 @@ app.use('/app/classes', requireLogin, require('./routes/classes'));
 app.use('/app/subjects', requireLogin, require('./routes/subjects'));
 app.use('/app/attendance', requireLogin, require('./routes/attendance'));
 app.use('/app/grades', requireLogin, require('./routes/grades'));
+app.use('/app/academic-years', requireLogin, require('./routes/academic-years'));
+app.use('/app/rooms', requireLogin, require('./routes/rooms'));
+app.use('/app/timetable', requireLogin, require('./routes/timetable'));
 app.use('/api', require('./routes/api'));
 
 // 404 handler

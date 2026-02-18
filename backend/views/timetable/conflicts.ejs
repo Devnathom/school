@@ -1,0 +1,142 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-exclamation-triangle mr-2"></i>วิเคราะห์ตารางเรียน</h1>
+        <small class="text-muted"><%= academicYear.name %></small>
+      </div>
+      <div class="col-sm-6 text-right">
+        <a href="/app/timetable" class="btn btn-secondary"><i class="fas fa-arrow-left mr-1"></i>กลับตารางเรียน</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+
+    <!-- Conflicts -->
+    <div class="card card-<%= conflicts.length > 0 ? 'danger' : 'success' %>">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-<%= conflicts.length > 0 ? 'exclamation-triangle' : 'check-circle' %> mr-2"></i>
+          ปัญหาที่พบ (<%= conflicts.length %> รายการ)
+        </h3>
+      </div>
+      <div class="card-body">
+        <% if (conflicts.length === 0) { %>
+          <div class="text-center py-3">
+            <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
+            <h5 class="text-success">ไม่พบปัญหาในตารางเรียน</h5>
+            <p class="text-muted">ครูไม่ชนกัน ห้องไม่ชนกัน ทุกอย่างเรียบร้อย</p>
+          </div>
+        <% } else { %>
+          <% conflicts.forEach(function(c) { %>
+          <div class="alert alert-<%= c.severity %> d-flex align-items-start">
+            <i class="fas <%= c.icon %> fa-2x mr-3 mt-1"></i>
+            <div>
+              <strong><%= c.message %></strong><br>
+              <small><%= c.detail %></small>
+            </div>
+          </div>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Teacher Workload -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header bg-info">
+            <h3 class="card-title"><i class="fas fa-chalkboard-teacher mr-2"></i>ภาระงานครู</h3>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>ครู</th>
+                  <th class="text-center">คาบ/สัปดาห์</th>
+                  <th class="text-center">วันที่สอน</th>
+                  <th>ชั้นเรียน</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% teacherWorkload.forEach(function(tw) { %>
+                <tr>
+                  <td><%= tw.firstName %> <%= tw.lastName %></td>
+                  <td class="text-center">
+                    <span class="badge badge-<%= tw.total_periods > 25 ? 'danger' : tw.total_periods > 20 ? 'warning' : 'success' %>">
+                      <%= tw.total_periods %>
+                    </span>
+                  </td>
+                  <td class="text-center"><%= tw.teaching_days %> วัน</td>
+                  <td><small><%= tw.classes || '-' %></small></td>
+                  <td>
+                    <% if (tw.total_periods > 0) { %>
+                    <a href="/app/timetable/teacher/<%= tw.id %>" class="btn btn-xs btn-outline-info" title="ดูตารางสอน">
+                      <i class="fas fa-calendar"></i>
+                    </a>
+                    <% } %>
+                  </td>
+                </tr>
+                <% }); %>
+                <% if (teacherWorkload.length === 0) { %>
+                <tr><td colspan="5" class="text-center text-muted">ไม่มีข้อมูล</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Class Completeness -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header bg-primary">
+            <h3 class="card-title"><i class="fas fa-school mr-2"></i>ความครบถ้วนของชั้นเรียน</h3>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>ชั้นเรียน</th>
+                  <th class="text-center">จัดแล้ว</th>
+                  <th class="text-center">ต้องการ</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% classLoad.forEach(function(cl) { %>
+                <tr>
+                  <td><strong><%= cl.name %></strong></td>
+                  <td class="text-center"><%= cl.scheduled_periods %></td>
+                  <td class="text-center"><%= cl.total_needed %></td>
+                  <td>
+                    <% if (cl.total_needed === 0) { %>
+                      <span class="badge badge-secondary">ยังไม่กำหนดวิชา</span>
+                    <% } else if (cl.scheduled_periods >= cl.total_needed) { %>
+                      <span class="badge badge-success"><i class="fas fa-check mr-1"></i>ครบ</span>
+                    <% } else { %>
+                      <span class="badge badge-warning">ขาด <%= cl.total_needed - cl.scheduled_periods %> คาบ</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <% }); %>
+                <% if (classLoad.length === 0) { %>
+                <tr><td colspan="4" class="text-center text-muted">ไม่มีข้อมูล</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../partials/footer', { success, error }) %>

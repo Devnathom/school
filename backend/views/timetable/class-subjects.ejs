@@ -1,0 +1,125 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-5">
+        <h1><i class="fas fa-list mr-2"></i>จัดวิชาเรียน</h1>
+        <small class="text-muted"><%= academicYear.name %></small>
+      </div>
+      <div class="col-sm-7 text-right">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addCSModal">
+          <i class="fas fa-plus mr-1"></i>เพิ่มรายวิชา
+        </button>
+        <a href="/app/timetable" class="btn btn-secondary ml-1">
+          <i class="fas fa-calendar-week mr-1"></i>ดูตารางเรียน
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">รายวิชาที่เปิดสอน</h3>
+        <div class="card-tools">
+          <span class="badge badge-info"><%= classSubjects.length %> รายการ</span>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped datatable">
+          <thead>
+            <tr>
+              <th>ชั้นเรียน</th>
+              <th>รหัสวิชา</th>
+              <th>ชื่อวิชา</th>
+              <th>ครูผู้สอน</th>
+              <th>คาบ/สัปดาห์</th>
+              <th width="80">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% classSubjects.forEach(function(cs) { %>
+            <tr>
+              <td><strong><%= cs.class_name %></strong></td>
+              <td><%= cs.subject_code %></td>
+              <td><%= cs.subject_name %></td>
+              <td><%= cs.teacher_first %> <%= cs.teacher_last %></td>
+              <td><span class="badge badge-primary"><%= cs.periods_per_week %> คาบ</span></td>
+              <td>
+                <a href="/app/timetable/class-subjects/delete/<%= cs.id %>" class="btn btn-sm btn-danger" onclick="return confirm('ลบรายวิชานี้?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            <% }); %>
+            <% if (classSubjects.length === 0) { %>
+            <tr><td colspan="6" class="text-center text-muted py-4">ยังไม่มีรายวิชา กดปุ่ม "เพิ่มรายวิชา" เพื่อกำหนดวิชาที่จะเปิดสอน</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <h5><i class="fas fa-info-circle mr-1"></i>คำแนะนำ</h5>
+      <p>เพิ่มรายวิชาทั้งหมดที่ต้องการเปิดสอนในแต่ละชั้นเรียน กำหนดครูผู้สอนและจำนวนคาบต่อสัปดาห์ จากนั้นกลับไปหน้าตารางเรียนแล้วกด <strong>"จัดตารางอัตโนมัติ"</strong> ระบบจะจัดตารางให้โดยไม่ให้ครูชนกันและห้องชนกัน</p>
+    </div>
+  </div>
+</section>
+
+<!-- Add Class-Subject Modal -->
+<div class="modal fade" id="addCSModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/app/timetable/class-subjects/add" method="POST">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white"><i class="fas fa-plus mr-2"></i>เพิ่มรายวิชา</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>ชั้นเรียน <span class="text-danger">*</span></label>
+            <select name="class_id" class="form-control" required>
+              <option value="">-- เลือกชั้นเรียน --</option>
+              <% classes.forEach(function(c) { %>
+              <option value="<%= c.id %>"><%= c.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>รายวิชา <span class="text-danger">*</span></label>
+            <select name="subject_id" class="form-control" required>
+              <option value="">-- เลือกรายวิชา --</option>
+              <% subjects.forEach(function(s) { %>
+              <option value="<%= s.id %>"><%= s.code %> - <%= s.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ครูผู้สอน <span class="text-danger">*</span></label>
+            <select name="teacher_id" class="form-control" required>
+              <option value="">-- เลือกครู --</option>
+              <% teachers.forEach(function(t) { %>
+              <option value="<%= t.id %>"><%= t.firstName %> <%= t.lastName %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>จำนวนคาบต่อสัปดาห์ <span class="text-danger">*</span></label>
+            <input type="number" name="periods_per_week" class="form-control" value="2" min="1" max="10" required>
+            <small class="text-muted">จำนวนครั้งที่สอนวิชานี้ต่อสัปดาห์</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { success, error }) %>

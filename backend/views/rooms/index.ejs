@@ -1,0 +1,121 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6"><h1><i class="fas fa-door-open mr-2"></i>จัดการห้องเรียน</h1></div>
+      <div class="col-sm-6 text-right">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addRoomModal">
+          <i class="fas fa-plus mr-1"></i>เพิ่มห้องเรียน
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-bordered table-striped datatable">
+          <thead>
+            <tr>
+              <th>ชื่อห้อง</th>
+              <th>อาคาร</th>
+              <th>ความจุ</th>
+              <th>ประเภท</th>
+              <th>สถานะ</th>
+              <th width="80">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% rooms.forEach(function(r) { %>
+            <tr>
+              <td><strong><%= r.name %></strong></td>
+              <td><%= r.building || '-' %></td>
+              <td><%= r.capacity %> คน</td>
+              <td>
+                <% if (r.room_type === 'classroom') { %>
+                  <span class="badge badge-primary">ห้องเรียน</span>
+                <% } else if (r.room_type === 'lab') { %>
+                  <span class="badge badge-info">ห้องปฏิบัติการ</span>
+                <% } else if (r.room_type === 'gym') { %>
+                  <span class="badge badge-success">โรงยิม</span>
+                <% } else if (r.room_type === 'library') { %>
+                  <span class="badge badge-warning">ห้องสมุด</span>
+                <% } else { %>
+                  <span class="badge badge-secondary">อื่นๆ</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge badge-<%= r.is_active ? 'success' : 'danger' %>">
+                  <%= r.is_active ? 'ใช้งาน' : 'ปิด' %>
+                </span>
+              </td>
+              <td>
+                <a href="#" onclick="confirmDelete('/app/rooms/delete/<%= r.id %>', '<%= r.name %>')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add Room Modal -->
+<div class="modal fade" id="addRoomModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/app/rooms/add" method="POST">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white"><i class="fas fa-plus mr-2"></i>เพิ่มห้องเรียน</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ชื่อห้อง <span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control" required placeholder="เช่น 101, Lab1">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>อาคาร</label>
+                <input type="text" name="building" class="form-control" placeholder="เช่น อาคาร 1">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ความจุ</label>
+                <input type="number" name="capacity" class="form-control" value="40" min="1">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ประเภท</label>
+                <select name="room_type" class="form-control">
+                  <option value="classroom">ห้องเรียน</option>
+                  <option value="lab">ห้องปฏิบัติการ</option>
+                  <option value="gym">โรงยิม</option>
+                  <option value="library">ห้องสมุด</option>
+                  <option value="other">อื่นๆ</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { success, error }) %>
