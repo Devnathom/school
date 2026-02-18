@@ -52,6 +52,7 @@ router.get('/', async (req, res) => {
       stats: { schools: 0, users: 0, students: 0, teachers: 0 },
       recentSchools: [],
       planStats: [],
+      success: null,
       error: error.message
     });
   }
@@ -97,12 +98,47 @@ router.post('/schools/add', async (req, res) => {
     
     // Create admin user
     const hashedPassword = await bcrypt.hash(admin_password, 10);
+    const username = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+    const [existingUsername] = await db.query('SELECT id FROM users WHERE username = ?', [username]);
+    const finalUsername = existingUsername.length > 0 ? username + result.insertId : username;
+    
     await db.query(
-      'INSERT INTO users (school_id, email, password, name, role) VALUES (?, ?, ?, ?, ?)',
-      [result.insertId, email, hashedPassword, admin_name, 'school_admin']
+      'INSERT INTO users (school_id, username, email, password, name, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [result.insertId, finalUsername, email, hashedPassword, admin_name, 'school_admin']
     );
     
     res.redirect('/admin/schools?success=เพิ่มโรงเรียนสำเร็จ');
+  } catch (error) {
+    res.redirect('/admin/schools?error=' + error.message);
+  }
+});
+
+// School Detail
+router.get('/schools/:id', async (req, res) => {
+  try {
+    const [[school]] = await db.query(`
+      SELECT s.*, p.name as plan_name, p.slug as plan_slug
+      FROM schools s
+      LEFT JOIN plans p ON s.plan_id = p.id
+      WHERE s.id = ?
+    `, [req.params.id]);
+    if (!school) return res.redirect('/admin/schools?error=ไม่พบโรงเรียน');
+    
+    const [users] = await db.query('SELECT * FROM users WHERE school_id = ?', [req.params.id]);
+    const [[studentCount]] = await db.query('SELECT COUNT(*) as count FROM students WHERE school_id = ?', [req.params.id]);
+    const [[teacherCount]] = await db.query('SELECT COUNT(*) as count FROM teachers WHERE school_id = ?', [req.params.id]);
+    const [[classCount]] = await db.query('SELECT COUNT(*) as count FROM classes WHERE school_id = ?', [req.params.id]);
+    
+    res.render('admin/school-detail', {
+      title: school.name,
+      page: 'schools',
+      user: req.session.user,
+      school,
+      schoolUsers: users,
+      stats: { students: studentCount.count, teachers: teacherCount.count, classes: classCount.count },
+      success: req.query.success || null,
+      error: req.query.error || null
+    });
   } catch (error) {
     res.redirect('/admin/schools?error=' + error.message);
   }

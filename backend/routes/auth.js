@@ -62,10 +62,17 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    // Generate username from email prefix
+    const username = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    // Check username uniqueness
+    const [existingUsername] = await db.query('SELECT id FROM users WHERE username = ?', [username]);
+    const finalUsername = existingUsername.length > 0 ? username + schoolId : username;
+    
     // Create admin user
     await db.query(
-      'INSERT INTO users (school_id, email, password, name, role) VALUES (?, ?, ?, ?, ?)',
-      [schoolId, email, hashedPassword, adminName, 'school_admin']
+      'INSERT INTO users (school_id, username, email, password, name, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [schoolId, finalUsername, email, hashedPassword, adminName, 'school_admin']
     );
     
     res.render('register', { plan, error: null, success: 'สมัครใช้งานสำเร็จ! กรุณาเข้าสู่ระบบ' });

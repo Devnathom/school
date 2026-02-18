@@ -71,7 +71,7 @@
                   <% } else { %>
                   <button onclick="changeStatus(<%= s.id %>, 'active')" class="btn btn-sm btn-success" title="เปิดใช้งาน"><i class="fas fa-check"></i></button>
                   <% } %>
-                  <button onclick="confirmDelete(<%= s.id %>, '<%= s.name %>')" class="btn btn-sm btn-danger" title="ลบ"><i class="fas fa-trash"></i></button>
+                  <button onclick="confirmDeleteSchool(<%= s.id %>, '<%= s.name %>')" class="btn btn-sm btn-danger" title="ลบ"><i class="fas fa-trash"></i></button>
                 </div>
               </td>
             </tr>
@@ -186,7 +186,7 @@ function changeStatus(id, status) {
   });
 }
 
-function confirmDelete(id, name) {
+function confirmDeleteSchool(id, name) {
   Swal.fire({
     title: 'ลบโรงเรียน?',
     text: 'คุณต้องการลบ "' + name + '" ใช่หรือไม่? ข้อมูลทั้งหมดจะถูกลบ!',

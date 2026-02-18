@@ -1,0 +1,124 @@
+<%- include('../partials/admin-header', { title, page, user }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-school mr-2"></i><%= school.name %></h1>
+      </div>
+      <div class="col-sm-6 text-right">
+        <a href="/admin/schools" class="btn btn-secondary"><i class="fas fa-arrow-left mr-1"></i>กลับ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header bg-primary">
+            <h3 class="card-title">ข้อมูลโรงเรียน</h3>
+          </div>
+          <div class="card-body">
+            <p><strong>ชื่อ:</strong> <%= school.name %></p>
+            <p><strong>Slug:</strong> <%= school.slug %></p>
+            <p><strong>อีเมล:</strong> <%= school.email %></p>
+            <p><strong>เบอร์โทร:</strong> <%= school.phone || '-' %></p>
+            <p><strong>แพ็กเกจ:</strong>
+              <span class="badge badge-<%= school.plan_slug === 'enterprise' ? 'danger' : school.plan_slug === 'pro' ? 'primary' : 'secondary' %>">
+                <%= school.plan_name %>
+              </span>
+            </p>
+            <p><strong>สถานะ:</strong>
+              <span class="badge badge-<%= school.status === 'active' ? 'success' : school.status === 'pending' ? 'warning' : 'danger' %>">
+                <%= school.status === 'active' ? 'ใช้งาน' : school.status === 'pending' ? 'รอยืนยัน' : 'ระงับ' %>
+              </span>
+            </p>
+            <p><strong>สมัครเมื่อ:</strong> <%= new Date(school.created_at).toLocaleDateString('th-TH') %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3><%= stats.students %></h3>
+                <p>นักเรียน</p>
+              </div>
+              <div class="icon"><i class="fas fa-user-graduate"></i></div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3><%= stats.teachers %></h3>
+                <p>ครู</p>
+              </div>
+              <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3><%= stats.classes %></h3>
+                <p>ชั้นเรียน</p>
+              </div>
+              <div class="icon"><i class="fas fa-school"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-users mr-2"></i>ผู้ใช้ในโรงเรียน</h3>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>ชื่อ</th>
+                  <th>Username</th>
+                  <th>อีเมล</th>
+                  <th>บทบาท</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% schoolUsers.forEach(function(u) { %>
+                <tr>
+                  <td><%= u.name %></td>
+                  <td><%= u.username || '-' %></td>
+                  <td><%= u.email %></td>
+                  <td>
+                    <% if (u.role === 'school_admin') { %>
+                      <span class="badge badge-primary">Admin</span>
+                    <% } else if (u.role === 'teacher') { %>
+                      <span class="badge badge-success">ครู</span>
+                    <% } else { %>
+                      <span class="badge badge-secondary">บุคลากร</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <span class="badge badge-<%= u.is_active ? 'success' : 'danger' %>">
+                      <%= u.is_active ? 'ใช้งาน' : 'ปิด' %>
+                    </span>
+                  </td>
+                </tr>
+                <% }); %>
+                <% if (schoolUsers.length === 0) { %>
+                <tr><td colspan="5" class="text-center text-muted">ยังไม่มีผู้ใช้</td></tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { success, error }) %>
