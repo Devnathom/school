@@ -17,8 +17,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- overlayScrollbars -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.1/js/OverlayScrollbars.min.js"></script>
 <!-- AdminLTE -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <!-- DataTables -->
@@ -36,12 +34,6 @@
       }
     });
 
-    // overlayScrollbars for sidebar
-    if (typeof OverlayScrollbars !== 'undefined') {
-      $('.sidebar').each(function() {
-        OverlayScrollbars(this, { className: 'os-theme-light', sizeAutoCapable: true, scrollbars: { autoHide: 'leave' } });
-      });
-    }
   });
 
   // SweetAlert for delete confirmation
