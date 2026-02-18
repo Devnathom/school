@@ -6,9 +6,23 @@ const db = require('../db');
 // Landing Page
 router.get('/', (req, res) => {
   if (req.session.user) {
+    if (req.session.user.role === 'super_admin') {
+      return res.redirect('/admin');
+    }
     return res.redirect('/app');
   }
   res.render('landing');
+});
+
+// Redirect old /dashboard to new location
+router.get('/dashboard', (req, res) => {
+  if (req.session.user) {
+    if (req.session.user.role === 'super_admin') {
+      return res.redirect('/admin');
+    }
+    return res.redirect('/app');
+  }
+  res.redirect('/login');
 });
 
 // Register Page
