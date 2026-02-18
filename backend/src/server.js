@@ -20,6 +20,26 @@ app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/grades', require('./routes/grades'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'School Management System API',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      students: '/api/students',
+      teachers: '/api/teachers',
+      classes: '/api/classes',
+      subjects: '/api/subjects',
+      attendance: '/api/attendance',
+      grades: '/api/grades',
+      dashboard: '/api/dashboard',
+      health: '/api/health'
+    }
+  });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'School Management API is running' });
