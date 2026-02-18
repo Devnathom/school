@@ -5,7 +5,9 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.render('dashboard', {
     title: 'แดชบอร์ด',
-    page: 'dashboard'
+    page: 'dashboard',
+    success: req.query.success || null,
+    error: req.query.error || null
   });
 });
 
