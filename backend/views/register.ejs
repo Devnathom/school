@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>สมัครใช้งาน | SchoolMS</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sarabun:300,400,500,600,700&display=swap&subset=thai">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>body{font-family:'Sarabun',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;}</style>
+</head>
+<body class="hold-transition register-page">
+<div class="register-box" style="width: 450px;">
+  <div class="card card-outline card-primary">
+    <div class="card-header text-center">
+      <a href="/" class="h3"><i class="fas fa-school text-primary"></i> <b>School</b>MS</a>
+      <p class="text-muted mb-0">สมัครใช้งานระบบบริหารจัดการโรงเรียน</p>
+    </div>
+    <div class="card-body">
+      <form action="/register" method="post" id="registerForm">
+        <h5 class="mb-3"><i class="fas fa-school mr-2"></i>ข้อมูลโรงเรียน</h5>
+        
+        <div class="input-group mb-3">
+          <input type="text" name="schoolName" class="form-control" placeholder="ชื่อโรงเรียน" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-building"></span></div></div>
+        </div>
+        
+        <div class="input-group mb-3">
+          <input type="text" name="schoolSlug" class="form-control" placeholder="URL โรงเรียน (เช่น demo-school)" required pattern="[a-z0-9-]+">
+          <div class="input-group-append"><div class="input-group-text">.schoolms.com</div></div>
+        </div>
+
+        <hr>
+        <h5 class="mb-3"><i class="fas fa-user mr-2"></i>ข้อมูลผู้ดูแลระบบ</h5>
+        
+        <div class="input-group mb-3">
+          <input type="text" name="adminName" class="form-control" placeholder="ชื่อ-นามสกุล ผู้ดูแล" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-user"></span></div></div>
+        </div>
+        
+        <div class="input-group mb-3">
+          <input type="email" name="email" class="form-control" placeholder="อีเมล" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-envelope"></span></div></div>
+        </div>
+        
+        <div class="input-group mb-3">
+          <input type="tel" name="phone" class="form-control" placeholder="เบอร์โทรศัพท์">
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-phone"></span></div></div>
+        </div>
+        
+        <div class="input-group mb-3">
+          <input type="password" name="password" class="form-control" placeholder="รหัสผ่าน" required minlength="6">
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-lock"></span></div></div>
+        </div>
+        
+        <div class="input-group mb-3">
+          <input type="password" name="confirmPassword" class="form-control" placeholder="ยืนยันรหัสผ่าน" required>
+          <div class="input-group-append"><div class="input-group-text"><span class="fas fa-lock"></span></div></div>
+        </div>
+
+        <hr>
+        <h5 class="mb-3"><i class="fas fa-tag mr-2"></i>เลือกแพ็กเกจ</h5>
+        
+        <div class="form-group">
+          <div class="custom-control custom-radio mb-2">
+            <input class="custom-control-input" type="radio" id="planFree" name="plan" value="free" <%= plan === 'free' ? 'checked' : '' %>>
+            <label class="custom-control-label" for="planFree">
+              <strong>ฟรี</strong> - นักเรียน 50 คน, ครู 10 คน
+            </label>
+          </div>
+          <div class="custom-control custom-radio mb-2">
+            <input class="custom-control-input" type="radio" id="planPro" name="plan" value="pro" <%= plan === 'pro' ? 'checked' : '' %>>
+            <label class="custom-control-label" for="planPro">
+              <strong>Pro ฿299/เดือน</strong> - นักเรียน 500 คน, ครู 50 คน
+            </label>
+          </div>
+          <div class="custom-control custom-radio mb-2">
+            <input class="custom-control-input" type="radio" id="planEnterprise" name="plan" value="enterprise" <%= plan === 'enterprise' ? 'checked' : '' %>>
+            <label class="custom-control-label" for="planEnterprise">
+              <strong>Enterprise ฿999/เดือน</strong> - ไม่จำกัด
+            </label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+              <i class="fas fa-rocket mr-2"></i>สมัครใช้งาน
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <hr>
+      <p class="text-center mb-0">
+        มีบัญชีอยู่แล้ว? <a href="/login">เข้าสู่ระบบ</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+$('#registerForm').on('submit', function(e) {
+  const pass = $('input[name="password"]').val();
+  const confirm = $('input[name="confirmPassword"]').val();
+  if (pass !== confirm) {
+    e.preventDefault();
+    Swal.fire('ผิดพลาด', 'รหัสผ่านไม่ตรงกัน', 'error');
+    return false;
+  }
+});
+
+<% if (typeof error !== 'undefined' && error) { %>
+Swal.fire('ผิดพลาด', '<%= error %>', 'error');
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+Swal.fire('สำเร็จ', '<%= success %>', 'success').then(() => window.location = '/login');
+<% } %>
+</script>
+</body>
+</html>

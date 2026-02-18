@@ -4,30 +4,32 @@ const db = require('../db');
 
 router.get('/', async (req, res) => {
   try {
-    const [students] = await db.query('SELECT * FROM students ORDER BY id DESC');
-    res.render('students/index', { title: 'จัดการนักเรียน', page: 'students', students });
+    const schoolId = req.session.user.school_id;
+    const [students] = await db.query('SELECT * FROM students WHERE school_id = ? ORDER BY id DESC', [schoolId]);
+    res.render('students/index', { title: 'จัดการนักเรียน', page: 'students', students, user: req.session.user });
   } catch (error) {
-    res.render('students/index', { title: 'จัดการนักเรียน', page: 'students', students: [], error: error.message });
+    res.render('students/index', { title: 'จัดการนักเรียน', page: 'students', students: [], user: req.session.user, error: error.message });
   }
 });
 
 router.get('/add', (req, res) => {
-  res.render('students/form', { title: 'เพิ่มนักเรียน', page: 'students', student: null });
+  res.render('students/form', { title: 'เพิ่มนักเรียน', page: 'students', student: null, user: req.session.user });
 });
 
 router.post('/add', async (req, res) => {
   try {
+    const schoolId = req.session.user.school_id;
     const { firstName, lastName, email, phone, classId, gender } = req.body;
-    const [result] = await db.query('SELECT COUNT(*) as count FROM students');
+    const [result] = await db.query('SELECT COUNT(*) as count FROM students WHERE school_id = ?', [schoolId]);
     const studentId = `STD${String(result[0].count + 1).padStart(3, '0')}`;
     
     await db.query(
-      'INSERT INTO students (studentId, firstName, lastName, email, phone, classId, gender, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [studentId, firstName, lastName, email, phone, classId || null, gender, 'active']
+      'INSERT INTO students (school_id, studentId, firstName, lastName, email, phone, classId, gender, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [schoolId, studentId, firstName, lastName, email, phone, classId || null, gender, 'active']
     );
-    res.redirect('/students?success=เพิ่มนักเรียนสำเร็จ');
+    res.redirect('/app/students?success=เพิ่มนักเรียนสำเร็จ');
   } catch (error) {
-    res.redirect('/students?error=' + error.message);
+    res.redirect('/app/students?error=' + error.message);
   }
 });
 

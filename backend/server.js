@@ -4,6 +4,7 @@ const session = require('express-session');
 require('dotenv').config();
 
 const app = express();
+const { requireLogin } = require('./middleware/auth');
 
 // View engine
 app.set('view engine', 'ejs');
@@ -21,14 +22,17 @@ app.use(session({
   saveUninitialized: false
 }));
 
-// Routes
-app.use('/', require('./routes/index'));
-app.use('/students', require('./routes/students'));
-app.use('/teachers', require('./routes/teachers'));
-app.use('/classes', require('./routes/classes'));
-app.use('/subjects', require('./routes/subjects'));
-app.use('/attendance', require('./routes/attendance'));
-app.use('/grades', require('./routes/grades'));
+// Public Routes (Landing, Login, Register)
+app.use('/', require('./routes/auth'));
+
+// Protected Routes (require login)
+app.use('/app', requireLogin, require('./routes/index'));
+app.use('/app/students', requireLogin, require('./routes/students'));
+app.use('/app/teachers', requireLogin, require('./routes/teachers'));
+app.use('/app/classes', requireLogin, require('./routes/classes'));
+app.use('/app/subjects', requireLogin, require('./routes/subjects'));
+app.use('/app/attendance', requireLogin, require('./routes/attendance'));
+app.use('/app/grades', requireLogin, require('./routes/grades'));
 app.use('/api', require('./routes/api'));
 
 // 404 handler
