@@ -25,6 +25,9 @@ app.use(session({
 // Public Routes (Landing, Login, Register)
 app.use('/', require('./routes/auth'));
 
+// Super Admin Routes
+app.use('/admin', require('./routes/admin'));
+
 // Protected Routes (require login)
 app.use('/app', requireLogin, require('./routes/index'));
 app.use('/app/students', requireLogin, require('./routes/students'));

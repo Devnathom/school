@@ -1,0 +1,206 @@
+<%- include('../partials/admin-header', { title, page, user }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-6"><h1><i class="fas fa-school mr-2"></i>จัดการโรงเรียน</h1></div>
+      <div class="col-sm-6 text-right">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addSchoolModal">
+          <i class="fas fa-plus mr-1"></i>เพิ่มโรงเรียน
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-bordered table-striped datatable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>โรงเรียน</th>
+              <th>ผู้ติดต่อ</th>
+              <th>แพ็กเกจ</th>
+              <th>จำนวน</th>
+              <th>สถานะ</th>
+              <th>วันที่สมัคร</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% schools.forEach(function(s) { %>
+            <tr>
+              <td><%= s.id %></td>
+              <td>
+                <strong><%= s.name %></strong><br>
+                <small class="text-muted"><%= s.slug %>.schoolms.com</small>
+              </td>
+              <td>
+                <%= s.email %><br>
+                <small><%= s.phone || '-' %></small>
+              </td>
+              <td>
+                <span class="badge badge-<%= s.plan_slug === 'enterprise' ? 'danger' : s.plan_slug === 'pro' ? 'primary' : 'secondary' %>">
+                  <%= s.plan_name %>
+                </span>
+              </td>
+              <td>
+                <small>
+                  <i class="fas fa-user-graduate"></i> <%= s.student_count || 0 %><br>
+                  <i class="fas fa-chalkboard-teacher"></i> <%= s.teacher_count || 0 %>
+                </small>
+              </td>
+              <td>
+                <% if (s.status === 'active') { %>
+                  <span class="badge badge-success">ใช้งาน</span>
+                <% } else if (s.status === 'pending') { %>
+                  <span class="badge badge-warning">รอยืนยัน</span>
+                <% } else { %>
+                  <span class="badge badge-danger">ระงับ</span>
+                <% } %>
+              </td>
+              <td><%= new Date(s.created_at).toLocaleDateString('th-TH') %></td>
+              <td>
+                <div class="btn-group">
+                  <a href="/admin/schools/<%= s.id %>" class="btn btn-sm btn-info" title="ดู"><i class="fas fa-eye"></i></a>
+                  <% if (s.status === 'active') { %>
+                  <button onclick="changeStatus(<%= s.id %>, 'suspended')" class="btn btn-sm btn-warning" title="ระงับ"><i class="fas fa-ban"></i></button>
+                  <% } else { %>
+                  <button onclick="changeStatus(<%= s.id %>, 'active')" class="btn btn-sm btn-success" title="เปิดใช้งาน"><i class="fas fa-check"></i></button>
+                  <% } %>
+                  <button onclick="confirmDelete(<%= s.id %>, '<%= s.name %>')" class="btn btn-sm btn-danger" title="ลบ"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add School Modal -->
+<div class="modal fade" id="addSchoolModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form action="/admin/schools/add" method="POST">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white"><i class="fas fa-plus mr-2"></i>เพิ่มโรงเรียนใหม่</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ชื่อโรงเรียน <span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>URL (slug) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input type="text" name="slug" class="form-control" required pattern="[a-z0-9-]+">
+                  <div class="input-group-append"><span class="input-group-text">.schoolms.com</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>อีเมล <span class="text-danger">*</span></label>
+                <input type="email" name="email" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>เบอร์โทร</label>
+                <input type="text" name="phone" class="form-control">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>แพ็กเกจ</label>
+                <select name="plan_id" class="form-control">
+                  <% plans.forEach(function(p) { %>
+                  <option value="<%= p.id %>"><%= p.name %> - ฿<%= p.price %>/เดือน</option>
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>สถานะ</label>
+                <select name="status" class="form-control">
+                  <option value="active">ใช้งาน</option>
+                  <option value="pending">รอยืนยัน</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <h6><i class="fas fa-user mr-2"></i>ข้อมูลผู้ดูแลโรงเรียน</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ชื่อผู้ดูแล <span class="text-danger">*</span></label>
+                <input type="text" name="admin_name" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>รหัสผ่าน <span class="text-danger">*</span></label>
+                <input type="password" name="admin_password" class="form-control" required minlength="6">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function changeStatus(id, status) {
+  Swal.fire({
+    title: status === 'active' ? 'เปิดใช้งาน?' : 'ระงับโรงเรียน?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'ยืนยัน',
+    cancelButtonText: 'ยกเลิก'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = '/admin/schools/' + id + '/status/' + status;
+    }
+  });
+}
+
+function confirmDelete(id, name) {
+  Swal.fire({
+    title: 'ลบโรงเรียน?',
+    text: 'คุณต้องการลบ "' + name + '" ใช่หรือไม่? ข้อมูลทั้งหมดจะถูกลบ!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    confirmButtonText: 'ลบ',
+    cancelButtonText: 'ยกเลิก'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = '/admin/schools/' + id + '/delete';
+    }
+  });
+}
+</script>
+
+<%- include('../partials/footer', { success, error }) %>
