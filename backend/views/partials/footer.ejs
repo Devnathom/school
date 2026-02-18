@@ -2,8 +2,14 @@
   <!-- /.content-wrapper -->
 
   <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 2.0
+    </div>
     <strong>SchoolMS</strong> - ระบบบริหารจัดการโรงเรียน &copy; 2024
   </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark"></aside>
 </div>
 <!-- ./wrapper -->
 
@@ -11,6 +17,8 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.1/js/OverlayScrollbars.min.js"></script>
 <!-- AdminLTE -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 <!-- DataTables -->
@@ -21,18 +29,26 @@
 
 <script>
   $(document).ready(function() {
+    // DataTables init
     $('.datatable').DataTable({
       language: {
         url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
       }
     });
+
+    // overlayScrollbars for sidebar
+    if (typeof OverlayScrollbars !== 'undefined') {
+      $('.sidebar').each(function() {
+        OverlayScrollbars(this, { className: 'os-theme-light', sizeAutoCapable: true, scrollbars: { autoHide: 'leave' } });
+      });
+    }
   });
 
   // SweetAlert for delete confirmation
   function confirmDelete(url, name) {
     Swal.fire({
       title: 'ยืนยันการลบ?',
-      text: `คุณต้องการลบ "${name}" ใช่หรือไม่?`,
+      text: 'คุณต้องการลบ "' + name + '" ใช่หรือไม่?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',

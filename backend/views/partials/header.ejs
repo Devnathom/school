@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <!-- AdminLTE 3 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css">
   <!-- DataTables -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
   <!-- SweetAlert2 -->
@@ -24,9 +26,11 @@
     .card-header { border-radius: 10px 10px 0 0 !important; }
     .btn { border-radius: 5px; }
     .table th { background: #f8f9fa; }
+    .user-panel .info a { font-size: 0.9rem; }
+    .sidebar-dark-primary .nav-header { color: #b8c7ce; }
   </style>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
 <div class="wrapper">
 
   <!-- Navbar -->
@@ -35,61 +39,141 @@
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/app" class="nav-link">หน้าหลัก</a>
+      </li>
     </ul>
+
     <ul class="navbar-nav ml-auto">
+      <!-- Fullscreen -->
+      <li class="nav-item">
+        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </a>
+      </li>
+      <!-- User dropdown -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-user"></i> <%= typeof user !== 'undefined' && user ? user.name : 'ผู้ใช้' %>
-          <% if (typeof user !== 'undefined' && user && user.school_name) { %>
-          <small class="text-muted">(<%= user.school_name %>)</small>
-          <% } %>
+          <i class="far fa-user-circle fa-lg mr-1"></i>
+          <%= typeof user !== 'undefined' && user ? user.name : 'ผู้ใช้' %>
         </a>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a href="/logout" class="dropdown-item"><i class="fas fa-sign-out-alt mr-2"></i> ออกจากระบบ</a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">
+            <% if (typeof user !== 'undefined' && user && user.school_name) { %>
+              <i class="fas fa-school mr-1"></i> <%= user.school_name %>
+            <% } %>
+          </span>
+          <div class="dropdown-divider"></div>
+          <a href="/app" class="dropdown-item">
+            <i class="fas fa-tachometer-alt mr-2"></i> แดชบอร์ด
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="/logout" class="dropdown-item dropdown-footer text-danger">
+            <i class="fas fa-sign-out-alt mr-2"></i> ออกจากระบบ
+          </a>
         </div>
       </li>
     </ul>
   </nav>
 
-  <!-- Sidebar -->
+  <!-- Main Sidebar -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <a href="/" class="brand-link">
-      <i class="fas fa-school brand-image ml-3" style="font-size: 24px;"></i>
-      <span class="brand-text font-weight-bold">SchoolMS</span>
+    <!-- Brand Logo -->
+    <a href="/app" class="brand-link">
+      <img src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png" alt="SchoolMS" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light"><b>School</b>MS</span>
     </a>
+
     <div class="sidebar">
+      <!-- Sidebar user panel -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block"><%= typeof user !== 'undefined' && user ? user.name : 'ผู้ใช้' %></a>
+          <% if (typeof user !== 'undefined' && user && user.school_name) { %>
+          <small class="text-muted d-block" style="margin-top:-2px;"><%= user.school_name %></small>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- SidebarSearch Form -->
+      <div class="form-inline">
+        <div class="input-group" data-widget="sidebar-search">
+          <input class="form-control form-control-sidebar" type="search" placeholder="ค้นหาเมนู..." aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-sidebar"><i class="fas fa-search fa-fw"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact" data-widget="treeview" role="menu" data-accordion="false">
+
+          <!-- Dashboard -->
           <li class="nav-item">
             <a href="/app" class="nav-link <%= page === 'dashboard' ? 'active' : '' %>">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>แดชบอร์ด</p>
             </a>
           </li>
-          <li class="nav-item">
-            <a href="/app/students" class="nav-link <%= page === 'students' ? 'active' : '' %>">
-              <i class="nav-icon fas fa-user-graduate"></i>
-              <p>จัดการนักเรียน</p>
+
+          <!-- ข้อมูลพื้นฐาน -->
+          <li class="nav-header">ข้อมูลพื้นฐาน</li>
+
+          <li class="nav-item has-treeview <%= ['students','teachers'].includes(page) ? 'menu-open' : '' %>">
+            <a href="#" class="nav-link <%= ['students','teachers'].includes(page) ? 'active' : '' %>">
+              <i class="nav-icon fas fa-users"></i>
+              <p>บุคลากร<i class="right fas fa-angle-left"></i></p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/app/students" class="nav-link <%= page === 'students' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>นักเรียน</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/app/teachers" class="nav-link <%= page === 'teachers' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>ครู/อาจารย์</p>
+                </a>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a href="/app/teachers" class="nav-link <%= page === 'teachers' ? 'active' : '' %>">
-              <i class="nav-icon fas fa-chalkboard-teacher"></i>
-              <p>จัดการครู</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="/app/classes" class="nav-link <%= page === 'classes' ? 'active' : '' %>">
+
+          <li class="nav-item has-treeview <%= ['classes','subjects','rooms'].includes(page) ? 'menu-open' : '' %>">
+            <a href="#" class="nav-link <%= ['classes','subjects','rooms'].includes(page) ? 'active' : '' %>">
               <i class="nav-icon fas fa-school"></i>
-              <p>ชั้นเรียน</p>
+              <p>โครงสร้างโรงเรียน<i class="right fas fa-angle-left"></i></p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/app/classes" class="nav-link <%= page === 'classes' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>ชั้นเรียน</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/app/subjects" class="nav-link <%= page === 'subjects' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>รายวิชา</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/app/rooms" class="nav-link <%= page === 'rooms' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>ห้องเรียน</p>
+                </a>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a href="/app/subjects" class="nav-link <%= page === 'subjects' ? 'active' : '' %>">
-              <i class="nav-icon fas fa-book"></i>
-              <p>รายวิชา</p>
-            </a>
-          </li>
+
+          <!-- กิจกรรมประจำวัน -->
+          <li class="nav-header">กิจกรรมประจำวัน</li>
+
           <li class="nav-item">
             <a href="/app/attendance" class="nav-link <%= page === 'attendance' ? 'active' : '' %>">
               <i class="nav-icon fas fa-clipboard-check"></i>
@@ -102,31 +186,44 @@
               <p>จัดการเกรด</p>
             </a>
           </li>
+
+          <!-- จัดตารางเรียน -->
           <li class="nav-header">จัดตารางเรียน</li>
+
           <li class="nav-item">
             <a href="/app/academic-years" class="nav-link <%= page === 'academic-years' ? 'active' : '' %>">
               <i class="nav-icon fas fa-calendar-alt"></i>
               <p>ปีการศึกษา</p>
             </a>
           </li>
-          <li class="nav-item">
-            <a href="/app/rooms" class="nav-link <%= page === 'rooms' ? 'active' : '' %>">
-              <i class="nav-icon fas fa-door-open"></i>
-              <p>ห้องเรียน</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="/app/timetable" class="nav-link <%= page === 'timetable' ? 'active' : '' %>">
+
+          <li class="nav-item has-treeview <%= ['timetable','timetable-analysis'].includes(page) ? 'menu-open' : '' %>">
+            <a href="#" class="nav-link <%= ['timetable','timetable-analysis'].includes(page) ? 'active' : '' %>">
               <i class="nav-icon fas fa-calendar-week"></i>
-              <p>ตารางเรียน</p>
+              <p>ตารางเรียน<i class="right fas fa-angle-left"></i></p>
             </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/app/timetable" class="nav-link <%= page === 'timetable' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>ดู/จัดตาราง</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/app/timetable/class-subjects" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>จัดวิชาเรียน</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/app/timetable/conflicts" class="nav-link <%= page === 'timetable-analysis' ? 'active' : '' %>">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>วิเคราะห์ตาราง</p>
+                </a>
+              </li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a href="/app/timetable/conflicts" class="nav-link <%= page === 'timetable-analysis' ? 'active' : '' %>">
-              <i class="nav-icon fas fa-exclamation-triangle"></i>
-              <p>วิเคราะห์ตาราง</p>
-            </a>
-          </li>
+
         </ul>
       </nav>
     </div>

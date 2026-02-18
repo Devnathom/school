@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sarabun:300,400,500,600,700&display=swap&subset=thai">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.1/css/OverlayScrollbars.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <style>
@@ -17,48 +18,88 @@
     .card-header { border-radius: 10px 10px 0 0 !important; }
     .btn { border-radius: 5px; }
     .table th { background: #f8f9fa; }
+    .user-panel .info a { font-size: 0.9rem; }
+    .sidebar-dark-primary .nav-header { color: #b8c7ce; }
   </style>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
 <div class="wrapper">
 
+  <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <ul class="navbar-nav">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <span class="nav-link text-muted"><i class="fas fa-crown text-warning mr-1"></i> Super Admin Panel</span>
+        <a href="/admin" class="nav-link"><i class="fas fa-crown text-warning mr-1"></i> Super Admin</a>
       </li>
     </ul>
     <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </a>
+      </li>
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-user mr-1"></i> <%= user.name %>
+          <i class="far fa-user-circle fa-lg mr-1"></i> <%= user.name %>
         </a>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a href="/" class="dropdown-item"><i class="fas fa-home mr-2"></i>หน้าแรก</a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header"><i class="fas fa-crown text-warning mr-1"></i> Super Admin</span>
           <div class="dropdown-divider"></div>
-          <a href="/logout" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ</a>
+          <a href="/" class="dropdown-item"><i class="fas fa-home mr-2"></i> หน้าแรก</a>
+          <div class="dropdown-divider"></div>
+          <a href="/logout" class="dropdown-item dropdown-footer text-danger"><i class="fas fa-sign-out-alt mr-2"></i> ออกจากระบบ</a>
         </div>
       </li>
     </ul>
   </nav>
 
+  <!-- Main Sidebar -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
     <a href="/admin" class="brand-link">
-      <i class="fas fa-crown brand-image ml-3 text-warning" style="font-size: 24px;"></i>
-      <span class="brand-text font-weight-bold">Super Admin</span>
+      <img src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png" alt="Super Admin" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light"><b>Super</b>Admin</span>
     </a>
+
     <div class="sidebar">
+      <!-- Sidebar user panel -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="https://adminlte.io/themes/v3/dist/img/user1-128x128.jpg" class="img-circle elevation-2" alt="Admin">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block"><%= user.name %></a>
+          <small class="text-warning d-block" style="margin-top:-2px;"><i class="fas fa-crown mr-1"></i>Super Admin</small>
+        </div>
+      </div>
+
+      <!-- SidebarSearch Form -->
+      <div class="form-inline">
+        <div class="input-group" data-widget="sidebar-search">
+          <input class="form-control form-control-sidebar" type="search" placeholder="ค้นหาเมนู..." aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-sidebar"><i class="fas fa-search fa-fw"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact" data-widget="treeview" role="menu" data-accordion="false">
+
+          <!-- Dashboard -->
           <li class="nav-item">
             <a href="/admin" class="nav-link <%= page === 'dashboard' ? 'active' : '' %>">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>แดชบอร์ด</p>
             </a>
           </li>
+
+          <li class="nav-header">จัดการระบบ</li>
+
           <li class="nav-item">
             <a href="/admin/schools" class="nav-link <%= page === 'schools' ? 'active' : '' %>">
               <i class="nav-icon fas fa-school"></i>
@@ -77,9 +118,11 @@
               <p>จัดการแพ็กเกจ</p>
             </a>
           </li>
+
         </ul>
       </nav>
     </div>
   </aside>
 
+  <!-- Content Wrapper -->
   <div class="content-wrapper">
