@@ -122,8 +122,8 @@ router.post('/login', async (req, res) => {
     // Update last login
     await db.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
     
-    // Set session
-    req.session.user = {
+    // Regenerate session to prevent session fixation
+    const userData = {
       id: user.id,
       email: user.email,
       name: user.name,
@@ -132,13 +132,20 @@ router.post('/login', async (req, res) => {
       school_name: user.school_name,
       school_slug: user.school_slug
     };
+    const redirectUrl = user.role === 'super_admin' ? '/admin' : '/app';
     
-    // Redirect based on role
-    if (user.role === 'super_admin') {
-      res.redirect('/admin');
-    } else {
-      res.redirect('/app');
-    }
+    req.session.regenerate(function(err) {
+      if (err) {
+        console.error('Session regenerate error:', err);
+      }
+      req.session.user = userData;
+      req.session.save(function(err) {
+        if (err) {
+          console.error('Session save error:', err);
+        }
+        res.redirect(redirectUrl);
+      });
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.render('login', { title: 'เข้าสู่ระบบ', error: 'เกิดข้อผิดพลาด' });
@@ -147,8 +154,11 @@ router.post('/login', async (req, res) => {
 
 // Logout
 router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  req.session.destroy(function(err) {
+    if (err) console.error('Logout error:', err);
+    res.clearCookie('schoolms_sid');
+    res.redirect('/');
+  });
 });
 
 module.exports = router;
