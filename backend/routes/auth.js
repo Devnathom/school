@@ -112,7 +112,12 @@ router.post('/login', async (req, res) => {
       school_slug: user.school_slug
     };
     
-    res.redirect('/app');
+    // Redirect based on role
+    if (user.role === 'super_admin') {
+      res.redirect('/admin');
+    } else {
+      res.redirect('/app');
+    }
   } catch (error) {
     console.error('Login error:', error);
     res.render('login', { title: 'เข้าสู่ระบบ', error: 'เกิดข้อผิดพลาด' });
