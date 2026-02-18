@@ -1,0 +1,58 @@
+  </div>
+  <!-- /.content-wrapper -->
+
+  <footer class="main-footer">
+    <strong>SchoolMS</strong> - ระบบบริหารจัดการโรงเรียน &copy; 2024
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  $(document).ready(function() {
+    $('.datatable').DataTable({
+      language: {
+        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
+      }
+    });
+  });
+
+  // SweetAlert for delete confirmation
+  function confirmDelete(url, name) {
+    Swal.fire({
+      title: 'ยืนยันการลบ?',
+      text: `คุณต้องการลบ "${name}" ใช่หรือไม่?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'ลบ',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = url;
+      }
+    });
+  }
+
+  // Show success/error messages
+  <% if (typeof success !== 'undefined' && success) { %>
+  Swal.fire({ icon: 'success', title: 'สำเร็จ', text: '<%= success %>', timer: 2000, showConfirmButton: false });
+  <% } %>
+  <% if (typeof error !== 'undefined' && error) { %>
+  Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: '<%= error %>' });
+  <% } %>
+</script>
+</body>
+</html>

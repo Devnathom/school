@@ -1,0 +1,31 @@
+<%- include('../partials/header', { title, page }) %>
+<div class="content-header"><div class="container-fluid"><h1><i class="fas fa-chart-line mr-2"></i>จัดการเกรด</h1></div></div>
+<section class="content"><div class="container-fluid">
+<div class="card">
+  <div class="card-header"><button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addModal"><i class="fas fa-plus"></i> บันทึกเกรด</button></div>
+  <div class="card-body">
+    <table class="table table-bordered datatable">
+      <thead><tr><th>นักเรียน</th><th>วิชา</th><th>กลางภาค</th><th>ปลายภาค</th><th>งาน</th><th>รวม</th><th>เกรด</th></tr></thead>
+      <tbody>
+        <% grades.forEach(function(g) { %>
+        <tr><td><%= g.firstName %> <%= g.lastName %></td><td><%= g.subjectName %></td><td><%= g.midterm %></td><td><%= g.final %></td><td><%= g.assignment %></td><td><%= g.total %></td><td><span class="badge badge-<%= g.grade === 'A' ? 'success' : g.grade === 'F' ? 'danger' : 'primary' %>"><%= g.grade %></span></td></tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div></section>
+<div class="modal fade" id="addModal"><div class="modal-dialog"><div class="modal-content">
+<form action="/grades/add" method="POST">
+  <div class="modal-header"><h5 class="modal-title">บันทึกเกรด</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label>นักเรียน</label><select name="studentId" class="form-control" required><option value="">เลือก</option><% students.forEach(function(s) { %><option value="<%= s.id %>"><%= s.firstName %> <%= s.lastName %></option><% }); %></select></div>
+    <div class="form-group"><label>วิชา</label><select name="subjectId" class="form-control" required><option value="">เลือก</option><% subjects.forEach(function(s) { %><option value="<%= s.id %>"><%= s.name %></option><% }); %></select></div>
+    <div class="form-group"><label>คะแนนกลางภาค (40)</label><input type="number" name="midterm" class="form-control" max="40" value="0"></div>
+    <div class="form-group"><label>คะแนนปลายภาค (40)</label><input type="number" name="final" class="form-control" max="40" value="0"></div>
+    <div class="form-group"><label>คะแนนงาน (20)</label><input type="number" name="assignment" class="form-control" max="20" value="0"></div>
+  </div>
+  <div class="modal-footer"><button type="submit" class="btn btn-primary">บันทึก</button></div>
+</form>
+</div></div></div>
+<%- include('../partials/footer', { success: null, error: null }) %>

@@ -1,0 +1,149 @@
+<%- include('partials/header', { title, page }) %>
+
+<!-- Content Header -->
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0"><i class="fas fa-tachometer-alt mr-2"></i>แดชบอร์ด</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <!-- Info boxes -->
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-info">
+          <div class="inner">
+            <h3 id="studentCount">0</h3>
+            <p>นักเรียน</p>
+          </div>
+          <div class="icon"><i class="fas fa-user-graduate"></i></div>
+          <a href="/students" class="small-box-footer">ดูทั้งหมด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-success">
+          <div class="inner">
+            <h3 id="teacherCount">0</h3>
+            <p>ครู/อาจารย์</p>
+          </div>
+          <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+          <a href="/teachers" class="small-box-footer">ดูทั้งหมด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-warning">
+          <div class="inner">
+            <h3 id="classCount">0</h3>
+            <p>ชั้นเรียน</p>
+          </div>
+          <div class="icon"><i class="fas fa-school"></i></div>
+          <a href="/classes" class="small-box-footer">ดูทั้งหมด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <h3 id="subjectCount">0</h3>
+            <p>รายวิชา</p>
+          </div>
+          <div class="icon"><i class="fas fa-book"></i></div>
+          <a href="/subjects" class="small-box-footer">ดูทั้งหมด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Quick Actions -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header bg-primary">
+            <h3 class="card-title"><i class="fas fa-bolt mr-2"></i>การดำเนินการด่วน</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6 col-md-4 mb-3">
+                <a href="/students/add" class="btn btn-outline-primary btn-block">
+                  <i class="fas fa-user-plus fa-2x mb-2"></i><br>เพิ่มนักเรียน
+                </a>
+              </div>
+              <div class="col-6 col-md-4 mb-3">
+                <a href="/teachers/add" class="btn btn-outline-success btn-block">
+                  <i class="fas fa-user-plus fa-2x mb-2"></i><br>เพิ่มครู
+                </a>
+              </div>
+              <div class="col-6 col-md-4 mb-3">
+                <a href="/attendance" class="btn btn-outline-warning btn-block">
+                  <i class="fas fa-clipboard-check fa-2x mb-2"></i><br>เช็คชื่อ
+                </a>
+              </div>
+              <div class="col-6 col-md-4 mb-3">
+                <a href="/grades" class="btn btn-outline-danger btn-block">
+                  <i class="fas fa-chart-line fa-2x mb-2"></i><br>บันทึกเกรด
+                </a>
+              </div>
+              <div class="col-6 col-md-4 mb-3">
+                <a href="/classes" class="btn btn-outline-info btn-block">
+                  <i class="fas fa-school fa-2x mb-2"></i><br>จัดการชั้นเรียน
+                </a>
+              </div>
+              <div class="col-6 col-md-4 mb-3">
+                <a href="/subjects" class="btn btn-outline-secondary btn-block">
+                  <i class="fas fa-book fa-2x mb-2"></i><br>จัดการวิชา
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Info -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header bg-success">
+            <h3 class="card-title"><i class="fas fa-info-circle mr-2"></i>ข้อมูลระบบ</h3>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <tr>
+                <td><i class="fas fa-calendar mr-2"></i>ปีการศึกษา</td>
+                <td><strong>2567</strong></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-clock mr-2"></i>ภาคเรียน</td>
+                <td><strong>ภาคเรียนที่ 2</strong></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-server mr-2"></i>สถานะระบบ</td>
+                <td><span class="badge badge-success">ปกติ</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-database mr-2"></i>ฐานข้อมูล</td>
+                <td><span class="badge badge-success">เชื่อมต่อแล้ว</span></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Load stats
+  fetch('/api/stats')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('studentCount').textContent = data.students;
+      document.getElementById('teacherCount').textContent = data.teachers;
+      document.getElementById('classCount').textContent = data.classes;
+      document.getElementById('subjectCount').textContent = data.subjects;
+    });
+</script>
+
+<%- include('partials/footer', { success: typeof success !== 'undefined' ? success : null, error: typeof error !== 'undefined' ? error : null }) %>

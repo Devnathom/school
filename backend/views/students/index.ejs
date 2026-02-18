@@ -1,0 +1,61 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1><i class="fas fa-user-graduate mr-2"></i>จัดการนักเรียน</h1>
+      </div>
+      <div class="col-sm-6 text-right">
+        <a href="/students/add" class="btn btn-primary"><i class="fas fa-plus mr-1"></i>เพิ่มนักเรียน</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">รายชื่อนักเรียนทั้งหมด</h3>
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered table-striped datatable">
+          <thead>
+            <tr>
+              <th width="80">รหัส</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>อีเมล</th>
+              <th>เบอร์โทร</th>
+              <th width="100">สถานะ</th>
+              <th width="120">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% students.forEach(function(s) { %>
+            <tr>
+              <td><%= s.studentId %></td>
+              <td><%= s.firstName %> <%= s.lastName %></td>
+              <td><%= s.email || '-' %></td>
+              <td><%= s.phone || '-' %></td>
+              <td>
+                <% if (s.status === 'active') { %>
+                  <span class="badge badge-success">ปกติ</span>
+                <% } else { %>
+                  <span class="badge badge-secondary">พ้นสภาพ</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/students/edit/<%= s.id %>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                <button onclick="confirmDelete('/students/delete/<%= s.id %>', '<%= s.firstName %> <%= s.lastName %>')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { success: typeof locals.success !== 'undefined' ? locals.success : null, error: typeof locals.error !== 'undefined' ? locals.error : null }) %>

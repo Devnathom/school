@@ -1,0 +1,81 @@
+<%- include('../partials/header', { title, page }) %>
+
+<div class="content-header">
+  <div class="container-fluid">
+    <h1><i class="fas fa-user-plus mr-2"></i><%= student ? 'แก้ไขนักเรียน' : 'เพิ่มนักเรียน' %></h1>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <form action="/students/<%= student ? 'edit/' + student.id : 'add' %>" method="POST">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>ชื่อ <span class="text-danger">*</span></label>
+                <input type="text" name="firstName" class="form-control" value="<%= student ? student.firstName : '' %>" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>นามสกุล <span class="text-danger">*</span></label>
+                <input type="text" name="lastName" class="form-control" value="<%= student ? student.lastName : '' %>" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>อีเมล</label>
+                <input type="email" name="email" class="form-control" value="<%= student ? student.email : '' %>">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>เบอร์โทร</label>
+                <input type="text" name="phone" class="form-control" value="<%= student ? student.phone : '' %>">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>เพศ</label>
+                <select name="gender" class="form-control">
+                  <option value="">เลือก</option>
+                  <option value="male" <%= student && student.gender === 'male' ? 'selected' : '' %>>ชาย</option>
+                  <option value="female" <%= student && student.gender === 'female' ? 'selected' : '' %>>หญิง</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>ชั้นเรียน</label>
+                <input type="number" name="classId" class="form-control" value="<%= student ? student.classId : '' %>">
+              </div>
+            </div>
+            <% if (student) { %>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>สถานะ</label>
+                <select name="status" class="form-control">
+                  <option value="active" <%= student.status === 'active' ? 'selected' : '' %>>ปกติ</option>
+                  <option value="inactive" <%= student.status === 'inactive' ? 'selected' : '' %>>พ้นสภาพ</option>
+                </select>
+              </div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึก</button>
+          <a href="/students" class="btn btn-secondary">ยกเลิก</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer', { success: null, error: null }) %>

@@ -1,0 +1,44 @@
+<%- include('../partials/header', { title, page }) %>
+<div class="content-header"><div class="container-fluid"><h1><i class="fas fa-clipboard-check mr-2"></i>เช็คชื่อ</h1></div></div>
+<section class="content"><div class="container-fluid">
+<div class="card">
+  <div class="card-header">
+    <form action="/attendance/class/" method="GET" class="form-inline" id="classForm">
+      <label class="mr-2">เลือกชั้นเรียน:</label>
+      <select class="form-control mr-2" onchange="if(this.value) window.location='/attendance/class/'+this.value">
+        <option value="">-- เลือก --</option>
+        <% classes.forEach(function(c) { %>
+        <option value="<%= c.id %>" <%= selectedClass == c.id ? 'selected' : '' %>><%= c.name %></option>
+        <% }); %>
+      </select>
+    </form>
+  </div>
+  <% if (students.length > 0) { %>
+  <form action="/attendance/save" method="POST">
+    <input type="hidden" name="classId" value="<%= selectedClass %>">
+    <input type="hidden" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead><tr><th>รหัส</th><th>ชื่อ-นามสกุล</th><th>มา</th><th>ขาด</th><th>สาย</th><th>ลา</th></tr></thead>
+        <tbody>
+          <% students.forEach(function(s) { %>
+          <tr>
+            <td><%= s.studentId %></td>
+            <td><%= s.firstName %> <%= s.lastName %></td>
+            <td><input type="radio" name="attendance[<%= s.id %>]" value="present" checked></td>
+            <td><input type="radio" name="attendance[<%= s.id %>]" value="absent"></td>
+            <td><input type="radio" name="attendance[<%= s.id %>]" value="late"></td>
+            <td><input type="radio" name="attendance[<%= s.id %>]" value="leave"></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer"><button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>บันทึกการเช็คชื่อ</button></div>
+  </form>
+  <% } else { %>
+  <div class="card-body"><p class="text-muted">กรุณาเลือกชั้นเรียน</p></div>
+  <% } %>
+</div>
+</div></section>
+<%- include('../partials/footer', { success: null, error: null }) %>
