@@ -1,40 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
-import { students } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const search = searchParams.get("search");
-  const classId = searchParams.get("classId");
+  try {
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search");
+    const classId = searchParams.get("classId");
 
-  let filteredStudents = [...students];
+    const students = await prisma.student.findMany({
+      where: {
+        AND: [
+          search ? {
+            OR: [
+              { firstName: { contains: search } },
+              { lastName: { contains: search } },
+              { studentId: { contains: search } },
+            ],
+          } : {},
+          classId ? { classId: parseInt(classId) } : {},
+        ],
+      },
+      orderBy: { id: "asc" },
+    });
 
-  if (search) {
-    const searchLower = search.toLowerCase();
-    filteredStudents = filteredStudents.filter(
-      (s) =>
-        s.firstName.toLowerCase().includes(searchLower) ||
-        s.lastName.toLowerCase().includes(searchLower) ||
-        s.studentId.toLowerCase().includes(searchLower)
-    );
+    return NextResponse.json(students);
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 });
   }
-
-  if (classId) {
-    filteredStudents = filteredStudents.filter(
-      (s) => s.classId === parseInt(classId)
-    );
-  }
-
-  return NextResponse.json(filteredStudents);
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const newStudent = {
-    id: students.length + 1,
-    studentId: `STD${String(students.length + 1).padStart(3, "0")}`,
-    ...body,
-    createdAt: new Date().toISOString().split("T")[0],
-  };
-  students.push(newStudent);
-  return NextResponse.json(newStudent, { status: 201 });
+  try {
+    const body = await request.json();
+    const count = await prisma.student.count();
+    const student = await prisma.student.create({
+      data: {
+        studentId: `STD${String(count + 1).padStart(3, "0")}`,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        email: body.email,
+        phone: body.phone,
+        classId: body.classId ? parseInt(body.classId) : null,
+        className: body.className,
+        gender: body.gender,
+        status: "active",
+      },
+    });
+    return NextResponse.json(student, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to create student" }, { status: 500 });
+  }
 }
