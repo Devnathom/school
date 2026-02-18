@@ -86,25 +86,25 @@ router.get('/login', (req, res) => {
 // Login POST
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
     
     const [users] = await db.query(
       `SELECT u.*, s.name as school_name, s.slug as school_slug, s.status as school_status 
        FROM users u 
        LEFT JOIN schools s ON u.school_id = s.id 
-       WHERE u.email = ? AND u.is_active = TRUE`,
-      [email]
+       WHERE u.username = ? AND u.is_active = TRUE`,
+      [username]
     );
     
     if (users.length === 0) {
-      return res.render('login', { title: 'เข้าสู่ระบบ', error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
+      return res.render('login', { title: 'เข้าสู่ระบบ', error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
     }
     
     const user = users[0];
     const validPassword = await bcrypt.compare(password, user.password);
     
     if (!validPassword) {
-      return res.render('login', { title: 'เข้าสู่ระบบ', error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
+      return res.render('login', { title: 'เข้าสู่ระบบ', error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
     }
     
     // Check school status
